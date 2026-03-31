@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>프리미엄 로또 번호 생성기</title>
+
+<style>
+body {
+    margin: 0;
+    background: #0b0f1a;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* 상단 */
+.header {
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* 광고 영역 */
+.ad-box {
+    margin: 10px auto;
+    width: 90%;
+    max-width: 700px;
+    height: 90px;
+    background: #1c2233;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    border-radius: 10px;
+}
+
+/* 컨테이너 */
+.container {
+    max-width: 700px;
+    margin: auto;
+    padding: 10px;
+}
+
+/* 줄 */
+.row {
+    background: #12182a;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+/* 번호 영역 */
+.numbers {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ball {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+/* 색상 */
+.ball:nth-child(1){background:#fbc400;color:black;}
+.ball:nth-child(2){background:#69c8f2;}
+.ball:nth-child(3){background:#ff7272;}
+.ball:nth-child(4){background:#aaa;}
+.ball:nth-child(5){background:#b0d840;}
+.ball:nth-child(6){background:#c996ff;}
+
+/* 애니메이션 */
+.roll {
+    animation: roll 0.5s ease;
+}
+
+@keyframes roll {
+    0% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* 버튼 영역 */
+.actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    flex: 1;
+    margin: 3px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 재추첨 */
+.regen {
+    background: #1e90ff;
+    color: white;
+}
+
+.regen:hover {
+    box-shadow: 0 0 10px #1e90ff;
+}
+
+/* 고정 */
+.lock {
+    background: #333;
+    color: white;
+}
+
+.lock.active {
+    background: #ff4444;
+}
+
+/* 전체 버튼 */
+.main-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: #ffd400;
+    color: black;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+.main-btn:hover {
+    box-shadow: 0 0 12px #ffd400;
+}
+
+/* CTA 영역 */
+.cta {
+    margin-top: 20px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🎰 AI 로또 번호 생성기</div>
+
+<div class="ad-box">광고 영역 (애드센스)</div>
+
+<div class="container" id="app"></div>
+
+<div class="container">
+    <button class="main-btn" onclick="generateAll()">전체 번호 다시 생성</button>
+</div>
+
+<div class="ad-box">광고 영역</div>
+
+<div class="cta">🔥 매주 추천 번호 업데이트 중</div>
+
+<script>
+const ROWS = 5;
+const COLS = 6;
+
+let numbers = [];
+let locks = Array(ROWS).fill(false);
+
+function rand() {
+    return Math.floor(Math.random() * 45) + 1;
+}
+
+function makeRow() {
+    let arr = [];
+    while (arr.length < COLS) {
+        let n = rand();
+        if (!arr.includes(n)) arr.push(n);
+    }
+    return arr.sort((a,b)=>a-b);
+}
+
+function animate(ball, final) {
+    let count = 0;
+    let interval = setInterval(() => {
+        ball.innerText = rand();
+        count++;
+        if (count > 8) {
+            clearInterval(interval);
+            ball.innerText = final;
+            ball.classList.add("roll");
+            setTimeout(()=>ball.classList.remove("roll"),300);
+        }
+    }, 60);
+}
+
+function render(animatedRows=[]) {
+    const app = document.getElementById("app");
+    app.innerHTML = "";
+
+    numbers.forEach((row, i) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "row";
+
+        const numDiv = document.createElement("div");
+        numDiv.className = "numbers";
+
+        row.forEach((n) => {
+            const ball = document.createElement("div");
+            ball.className = "ball";
+
+            if (animatedRows.includes(i) && !locks[i]) {
+                animate(ball, n);
+            } else {
+                ball.innerText = n;
+            }
+
+            numDiv.appendChild(ball);
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const regen = document.createElement("button");
+        regen.className = "regen";
+        regen.innerText = "재추첨";
+        regen.onclick = () => {
+            if (!locks[i]) {
+                numbers[i] = makeRow();
+                render([i]);
+            }
+        };
+
+        const lock = document.createElement("button");
+        lock.className = "lock" + (locks[i] ? " active" : "");
+        lock.innerText = locks[i] ? "고정됨" : "고정";
+        lock.onclick = () => {
+            locks[i] = !locks[i];
+            render();
+        };
+
+        actions.appendChild(regen);
+        actions.appendChild(lock);
+
+        rowDiv.appendChild(numDiv);
+        rowDiv.appendChild(actions);
+
+        app.appendChild(rowDiv);
+    });
+}
+
+function generateAll() {
+    let animated = [];
+    numbers = numbers.map((row, i) => {
+        if (locks[i]) return row;
+        animated.push(i);
+        return makeRow();
+    });
+    render(animated);
+}
+
+function init() {
+    for (let i = 0; i < ROWS; i++) {
+        numbers.push(makeRow());
+    }
+    render();
+}
+
+init();
+</script>
+
+</body>
+</html>
+
