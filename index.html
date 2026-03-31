@@ -1,14 +1,29 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프리미엄 로또 번호 생성기</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+<body data-theme="dark">
+
+    <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">☀️ 라이트 모드</button>
+
+    <div class="header">🎰 AI 로또 번호 생성기</div>
+
+    <div class="ad-box">광고 영역 (애드센스)</div>
+
+    <div class="container" id="app"></div>
+
+    <div class="container">
+        <button class="main-btn" onclick="generateAll()">전체 번호 다시 생성</button>
+    </div>
+
+    <div class="ad-box">광고 영역</div>
+
+    <div class="cta">🔥 매주 추천 번호 업데이트 중</div>
+
+    <script src="main.js"></script>
 </body>
 </html>
